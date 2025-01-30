@@ -66,8 +66,9 @@
 
             $result = $conn->query($query);
 
+            
             if($result){
-                echo "se subio";
+                return $conn->insert_id;
             }
         }
         public function listar(){
@@ -140,7 +141,6 @@
             $query = "SELECT * FROM empleados WHERE nombre = '{$this->nombre}' AND apellido = '{$this->apellido}'";
 
             $result= $conn->query($query);
-
             if($result->num_rows>0){
                 $user = $result->fetch_assoc();
                 $this->usuario = $user["usuario"];
@@ -171,8 +171,8 @@
 
             $conn->query($query);
 
-            echo "Usuario creado";
-
+            return $conn->insert_id;
+           
         }
         public function listar(){
             $conn = $this->Conectar();
@@ -187,6 +187,8 @@
                     array_push($array,$empleado);
                 }
                 return $array;
+            }else{
+                return false;
             }
 
         }
@@ -205,7 +207,7 @@
             }else{
                 return false;
             }
-            return $array;
+            
 
         }
         
