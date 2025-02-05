@@ -9,7 +9,7 @@
 
 ?>
 
-
+ 
 <head>
     <link rel="stylesheet" href="./style.css">
 </head>
@@ -17,8 +17,10 @@
 <h2>Alta empleado</h2>
 
 <form method="POST">
-    <input name="nombre">
-    <input name="apellido">
+    <input name="nombre" placeholder="nombre">
+    <input name="apellido" placeholder="apellido">
+    <input name="usuario" placeholder="usuarios">
+    <input name="contraseña" type="password" placeholder="contraseña">
     <button name="alta_empleado">Dar de alta</button>
 </form>
 
@@ -28,12 +30,18 @@
         if(isset($_POST["alta_empleado"])){
             $nombre = $_POST["nombre"];
             $apellido = $_POST["apellido"];
+            $usuario = $_POST["usuario"];
+            $contraseña = $_POST["contraseña"];
 
 
             $empleado = new Empleado($nombre, $apellido);
+            $empleado->setClave($contraseña);
+            $empleado->setUsuario($usuario);
             $id = $empleado->alta();
-
-            echo "El numero del empleado cargado es {$id}";
+           
+            if(isset($id)){
+                echo "El numero del empleado cargado es {$id}";
+            }
         }
 
     }
@@ -60,7 +68,8 @@
             $resultado = $empleado->listar();
         ?>
 
-        <?php foreach($resultado as $fila): ?>
+        <?php if($resultado){?>
+            <?php foreach($resultado as $fila): ?>
             <tr >
                 <td><?= $fila["nroEmpleado"] ?> </td>
                 <td><?= $fila["nombre"] ?> </td>
@@ -68,6 +77,8 @@
 
             </tr>
         <?php endforeach?>
+
+        <?php } ?>
 
 
     </tbody>

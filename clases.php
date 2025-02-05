@@ -4,31 +4,16 @@
         private $host = "localhost";
         private $userName = "root";
         private $password = "";
-        private $nameDB = "test";
+        private $nameDB = "HernanZapataIntegrador";
 
         public function Conectar(){
-            $conn = new mysqli($this->host,$this->userName, $this->password, $this->nameDB);
+            try{
+                $conn = new mysqli($this->host,$this->userName, $this->password, $this->nameDB);
+                return $conn;
 
-            $query = "CREATE TABLE IF NOT EXISTS productos(
-            codigo int auto_increment primary key,
-            descripcion varchar(30),
-            precio float);
-
-            ";
-            $conn->query($query);
-
-            $query = "CREATE TABLE IF NOT EXISTS empleados(
-                nroEmpleado int auto_increment primary key,
-                nombre varchar(30),
-                apellido varchar(30),
-                usuario varchar(30),
-                contra varchar(30),
-                UNIQUE(usuario)
-
-            );";
-
-            $conn->query($query);
-            return $conn;
+            }catch(Exception $e){
+                echo "Erro al cargar la base de datos";
+            }
 
         }
 
@@ -133,25 +118,39 @@
             $this->apellido = $apellido;
         }
         public function mostrarDatos(){
-
+            echo "<h1>Datos del usuario</h1>";
+            echo "nombre: " . $this->nombre . "<br>";
+            echo "apellido: " . $this->apellido . "<br>";
+            echo "usuario: " . $this->usuario . "<br>";
+            echo "contra: " . $this->clave . "<br>";
         }
         public function iniciarSesion()
         {
             $conn = $this->Conectar();
-            $query = "SELECT * FROM empleados WHERE nombre = '{$this->nombre}' AND apellido = '{$this->apellido}'";
+            $query = "SELECT * FROM empleados WHERE usuario = '{$this->usuario}'";
 
             $result= $conn->query($query);
             if($result->num_rows>0){
                 $user = $result->fetch_assoc();
-                $this->usuario = $user["usuario"];
-                $this->clave = $user["contra"];
-                $this->nombre = $user["nombre"];
-                $this->apellido = $user["apellido"];
+                
+                if($user["contra"] == $this->clave){
+                    $this->usuario = $user["usuario"];
+                    $this->clave = $user["contra"];
+                    $this->nombre = $user["nombre"];
+                    $this->apellido = $user["apellido"];
+    
+                    $_SESSION["usuario"] =  $user["usuario"];
+                    $_SESSION["clave"] =  $user["contra"];
+                    $_SESSION["nombre"] =  $user["nombre"];
+                    $_SESSION["apellido"] =  $user["apellido"];
+                    $this->mostrarDatos();
+                }else{
+                    return "usuario o contraseña incorrectos";
+                }
 
-                $_SESSION["usuario"] =  $user["usuario"];
-                $_SESSION["clave"] =  $user["contra"];
-                $_SESSION["nombre"] =  $user["nombre"];
-                $_SESSION["apellido"] =  $user["apellido"];
+
+
+               
             }
 
 
@@ -163,15 +162,29 @@
 
             header("Location: index.php");
         }
+        
+        public function setClave($clave){
+            $this->clave = $clave;
 
+        }
+        public function setUsuario($usuario){
+            $this->usuario = $usuario;
+        }
         public function alta(){
             $conn = $this->Conectar();
 
-            $query = "INSERT INTO empleados (nombre,apellido) VALUES ('{$this->nombre}','{$this->apellido}')";
+            $query = "INSERT INTO empleados (nombre,apellido,usuario,contra) VALUES ('{$this->nombre}','{$this->apellido}','{$this->usuario}','{$this->clave}')";
 
-            $conn->query($query);
+            try{
+                $conn->query($query);
 
-            return $conn->insert_id;
+                return $conn->insert_id;
+            }catch(Exception $err){
+                if($err->getCode() == 1062){
+                    echo "El nombre de usuario ya esta registrado";
+                }
+                
+            }
            
         }
         public function listar(){

@@ -4,12 +4,16 @@
     
     if($_SERVER["REQUEST_METHOD"] == "POST"){
         if(isset($_POST["iniciar_sesion"])){
-            $nombre = $_POST["nombre"];
-            $apellido = $_POST["apellido"];
-            $emplado = new Empleado($nombre,$apellido);
+            $usuario = $_POST["usuario"];
+            $contra = $_POST["contra"];
+            $emplado = new Empleado("","");
+            $emplado->setClave($contra);
+            $emplado->setUsuario($usuario);  
 
 
-            $emplado->iniciarSesion();
+            $result = $emplado->iniciarSesion();
+
+            
         }
         if(isset($_POST["cerrar_sesion"])){
             $emplado = new Empleado($_SESSION["nombre"],$_SESSION["apellido"]);
@@ -35,8 +39,8 @@
 
 
 <form method="POST">
-    <input name="nombre" placeholder="nombre">
-    <input name="apellido" placeholder="apellido">
+    <input name="usuario" placeholder="usuario">
+    <input name="contra" placeholder="contra">
     <button name="iniciar_sesion">INICIAR SESION</button>
     <button name="cerrar_sesion">CERRAR SESION</button>
 
@@ -52,9 +56,6 @@
 
 
 </form>
+<?= $_SESSION["usuario"] ?>
 
 
-
-<?php if(isset($_SESSION["nombre"])){ ?>
-<div style="width:100px;height: 100px;border-radius: 50% ;background:red"><?= $_SESSION["nombre"]?></div>
-<?php }?>
